@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html, body, #app { height: 100%; }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-thumb { background: #232b39; border-radius: 8px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+}
+
+@layer components {
+  .card { @apply rounded-xl border border-line bg-ink-850; }
+  .card-pad { @apply p-4 sm:p-5; }
+  .label { @apply block text-[11px] font-medium uppercase tracking-wider text-slate-500 mb-1.5; }
+  .input {
+    @apply w-full rounded-lg border border-line bg-ink-900 px-3 py-2 text-sm text-slate-100
+           placeholder:text-slate-600 focus:border-accent-dim focus:outline-none focus:ring-1 focus:ring-accent-dim;
+  }
+  .btn { @apply inline-flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition disabled:opacity-40; }
+  .btn-primary { @apply btn bg-accent text-ink-950 hover:bg-accent-soft; }
+  .btn-ghost { @apply btn border border-line bg-ink-800 text-slate-200 hover:border-accent-dim hover:text-white; }
+  .btn-danger { @apply btn border border-danger/40 bg-danger/10 text-danger hover:bg-danger/20; }
+  .btn-sm { @apply px-2.5 py-1 text-xs; }
+  .badge { @apply inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[11px] font-medium; }
+  .th { @apply px-3 py-2 text-left text-[11px] font-medium uppercase tracking-wider text-slate-500; }
+  .td { @apply px-3 py-2.5 text-sm text-slate-300 align-top; }
+  .row { @apply border-t border-line/70 hover:bg-ink-800/50; }
+  .mono { @apply font-mono text-xs; }
+  .link { @apply text-accent hover:text-accent-soft; }
+}

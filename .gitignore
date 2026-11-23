@@ -1,0 +1,12 @@
+.env
+*.db
+*.sqlite*
+data/media/
+data/sessions/
+.venv/
+__pycache__/
+*.pyc
+node_modules/
+bin/ffmpeg
+bin/ffprobe
+*.log

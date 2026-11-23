@@ -1,0 +1,11 @@
+{
+ "checked_at": "2026-11-23T16:21:35.024845+00:00",
+ "llm": "skip",
+ "tts": "skip",
+ "asr": "skip",
+ "control_bot": "ok",
+ "ffmpeg": true,
+ "model": "openai/gpt-oss-120b",
+ "tg_api": true,
+ "mode": "light"
+}
