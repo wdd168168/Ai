@@ -252,23 +252,3 @@ ai-operator/
 cd backend
 python tests/selftest_core.py     # 38 项：语言/拟人化/风格/记忆/画像/生成链路
 ```
-
-## 多厂商模型轮换（v2）
-
-`LLM_PROVIDERS` 支持配置一条轮换链，按顺序尝试，前一家额度用完 / 限流 / 模型下线会自动换下一家，
-不会因为某一家挂掉就哑巴。每项格式：
-
-```json
-[
-  {"name":"groq-120b","base_url":"https://api.groq.com/openai/v1","api_key":"gsk_xxx",
-   "models":["openai/gpt-oss-120b"],"json_models":["openai/gpt-oss-120b"],
-   "extra":{"reasoning_effort":"low"}},
-  {"name":"groq-qwen","base_url":"https://api.groq.com/openai/v1","api_key":"gsk_xxx",
-   "models":["qwen/qwen3.8-27b"]}
-]
-```
-
-- `extra` 会原样并入请求体（例如 `reasoning_effort: low`，避免思考过程吃掉额度导致空回复）
-- `json_models` 用于记忆抽取、画像这类结构化任务，可单独指定
-- 语音转写同样有降级链：Groq Whisper → Gemini 多模态 → OpenAI Whisper
-

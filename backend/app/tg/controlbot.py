@@ -109,8 +109,80 @@ async def start_control_bot() -> None:
                 pass
 
     start_api_channel()
+    start_heartbeat()
+    await _setup_commands()
     log.info("控制 bot 已启动 @%s（双通道接收）", getattr(me, "username", "?"))
 
+
+
+
+
+COMMANDS = [
+    ("start", "开始 / 查看全部指令"),
+    ("status", "账号状态：在线、停发、人设"),
+    ("login", "绑定账号（发 /login +手机号）"),
+    ("code", "填登录验证码"),
+    ("pass", "填两步验证密码"),
+    ("personas", "看 12 个人设"),
+    ("use", "给账号换人设"),
+    ("on", "开某个账号的 AI"),
+    ("off", "关某个账号的 AI"),
+    ("stop", "全部停发（急停）"),
+    ("resume", "全部恢复"),
+    ("skip", "今天别回某个人"),
+    ("takeover", "人工接管某人 2 小时"),
+    ("diag", "系统自检"),
+    ("test", "真跑一次模型"),
+    ("help", "指令表"),
+]
+
+
+async def _setup_commands() -> None:
+    """把指令挂到 Telegram 的菜单里，点一下就能用。"""
+    token = _token()
+    if not token:
+        return
+    base = f"https://api.telegram.org/bot{token}"
+    try:
+        async with httpx.AsyncClient(timeout=20) as c:
+            await c.post(
+                f"{base}/setMyCommands",
+                json={"commands": [{"command": k, "description": v} for k, v in COMMANDS]},
+            )
+            await c.post(
+                f"{base}/setMyDescription",
+                json={"description": "你的账号自动聊天中控台：绑号、换人设、开关 AI、急停，全在聊天里完成。"},
+            )
+    except Exception as e:
+        log.warning("设置菜单失败（不影响指令使用）: %s", e)
+
+
+_heartbeat_task: asyncio.Task | None = None
+
+
+async def _heartbeat_loop() -> None:
+    """每 5 分钟把在线时间写进 bot 简介（可被外部读回，用来确认进程真在跑）。"""
+    token = _token()
+    if not token:
+        return
+    url = f"https://api.telegram.org/bot{token}/setMyShortDescription"
+    while True:
+        try:
+            now = datetime.now(timezone.utc).strftime("%m-%d %H:%MZ")
+            model = (env.LLM_MODEL or "").split("/")[-1][:18]
+            desc = f"在线 {now} · {model}"
+            async with httpx.AsyncClient(timeout=20) as c:
+                await c.post(url, json={"short_description": desc})
+        except Exception:
+            pass
+        await asyncio.sleep(300)
+
+
+def start_heartbeat() -> None:
+    global _heartbeat_task
+    if _heartbeat_task and not _heartbeat_task.done():
+        return
+    _heartbeat_task = asyncio.create_task(_heartbeat_loop(), name="control-heartbeat")
 
 
 def _preset_admins() -> list[int]:

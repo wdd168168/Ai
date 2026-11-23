@@ -155,8 +155,10 @@ async def load_config(db: AsyncSession) -> LLMConfig:
             data.get("fallback_models") or settings.LLM_FALLBACK_MODELS
         ),
     )
-    # 后台设置里可以覆盖轮换链；否则用环境变量里的
-    cfg.providers = _parse_providers(data.get("providers") or settings.LLM_PROVIDERS, cfg)
+    # 轮换链优先用环境变量里的配置（部署时以 .env 为准），后台显式改过才覆盖
+    cfg.providers = _parse_providers(settings.LLM_PROVIDERS, cfg) or _parse_providers(
+        data.get("providers"), cfg
+    )
     return cfg
 
 
